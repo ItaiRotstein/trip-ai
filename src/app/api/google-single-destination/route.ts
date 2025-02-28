@@ -21,13 +21,13 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "No places found" }, { status: 404 });
         }
 
-        const place = searchData.results[0]; // Take the first result
-        const placeId = place.place_id;
-        const coordinates = place.geometry.location;
+        const destination = searchData.results[0]; // Take the first result
+        const destinationId = destination.place_id;
+        const coordinates = destination.geometry.location;
 
         // Get detailed place info
-        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_PLACES_API_KEY}&fields=editorial_summary,photos,geometry,types`;
-        const destinationEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_EMBED_API_KEY}&q=place_id:${placeId}`;
+        const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${destinationId}&key=${GOOGLE_PLACES_API_KEY}&photos,geometry,types`;
+        const destinationEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_EMBED_API_KEY}&q=place_id:${destinationId}`;
         const detailsResponse = await fetch(detailsUrl);
         const detailsData = await detailsResponse.json();
 
@@ -44,8 +44,8 @@ export async function GET(req: Request) {
         
             const validateImage = async (url: string) => {
                 try {
-                    const res = await fetch(url, { method: "HEAD" }); // ✅ Check if image is valid
-                    return res.ok ? url : null; // If valid (200), return URL; otherwise, null
+                    const res = await fetch(url, { method: "HEAD" });
+                    return res.ok ? url : null;
                 } catch {
                     return null;
                 }
@@ -57,12 +57,14 @@ export async function GET(req: Request) {
                         ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${place.photos[0].photo_reference}&key=${GOOGLE_PLACES_API_KEY}`
                         : null;
         
-                    const validImage = imageUrl ? await validateImage(imageUrl) : null; // Validate image
+                    const validImage = imageUrl ? await validateImage(imageUrl) : null;
         
                     return {
                         name: place.name,
                         id: place.place_id,
-                        imageUrl: validImage || null, // ✅ Only include valid images
+                        parentId: destinationId,
+                        parentCity: city,
+                        imageUrl: validImage || null,
                         mapsEmbed: place.place_id
                             ? `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_EMBED_API_KEY}&q=place_id:${place.place_id}`
                             : null,

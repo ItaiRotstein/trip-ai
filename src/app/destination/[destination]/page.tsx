@@ -10,16 +10,16 @@ export default async function DestinationPage({ params }: { params: { destinatio
 
     // Move fetch to server component
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/google-single-destination?city=${destinationName}`);
-    const placeData = await response.json();
+    const selectedDestination = await response.json();
     
-    if (!placeData || placeData.error) {
+    if (!selectedDestination || selectedDestination.error) {
         notFound();
     }
 
     return (
         <div className="p-6">
             <h1 className="text-3xl font-bold">{destinationName}</h1>
-            <DestinationDetails placeData={placeData} />
+            <DestinationDetails selectedDestination={selectedDestination} />
         </div>
     );
 }

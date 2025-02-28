@@ -13,8 +13,8 @@ interface Place {
     mapsEmbed: string;
 }
 
-export default function DestinationDetails({ placeData }: { placeData: any; }) {
-    const [selectedEmbedUrl, setSelectedEmbedUrl] = useState<string>(placeData.destinationEmbedUrl);
+export default function DestinationDetails({ selectedDestination }: { selectedDestination: any; }) {
+    const [selectedEmbedUrl, setSelectedEmbedUrl] = useState<string>(selectedDestination.destinationEmbedUrl);
     const { savedPlaces, addPlace, removePlace } = useSavedPlaces();
 
     const isPlaceSaved = (placeId: string) => {
@@ -23,7 +23,7 @@ export default function DestinationDetails({ placeData }: { placeData: any; }) {
 
     return (
         <section className="p-4">
-            <h2 className="text-2xl font-semibold mt-4">Explore {placeData.city}</h2>
+            <h2 className="text-2xl font-semibold mt-4">Explore {selectedDestination.city}</h2>
 
             <div className="flex flex-col md:flex-row gap-4">
                 {/* Google Maps Embed Section */}
@@ -48,14 +48,15 @@ export default function DestinationDetails({ placeData }: { placeData: any; }) {
                         {/* Places to Visit */}
                         <TabsContent value="places">
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                                {placeData.placesToVisit.map((place: Place, index: number) => (
+                                {selectedDestination.placesToVisit.map((place: Place, index: number) => (
                                     place.imageUrl &&
-                                    <div 
-                                        key={place.id} 
+                                    <div
+                                        key={place.id}
                                         className="relative group"
                                     >
                                         <Card
-                                            className="cursor-pointer hover:bg-gray-100 transition"
+                                            className={`cursor-pointer hover:bg-gray-100 transition 
+                                                ${isPlaceSaved(place.id) ? ' border border-green-400' : ''}`}
                                             onClick={() => setSelectedEmbedUrl(place.mapsEmbed)}
                                         >
                                             <CardHeader className="p-2">
@@ -95,14 +96,15 @@ export default function DestinationDetails({ placeData }: { placeData: any; }) {
                         {/* Restaurants */}
                         <TabsContent value="restaurants">
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                                {placeData.restaurants.map((restaurant: Place, index: number) => (
+                                {selectedDestination.restaurants.map((restaurant: Place, index: number) => (
                                     restaurant.imageUrl &&
-                                    <div 
-                                        key={restaurant.id} 
+                                    <div
+                                        key={restaurant.id}
                                         className="relative group"
                                     >
                                         <Card
-                                            className="cursor-pointer hover:bg-gray-100 transition"
+                                            className={`cursor-pointer hover:bg-gray-100 transition 
+                                                ${isPlaceSaved(restaurant.id) ? ' border border-green-400' : ''}`}
                                             onClick={() => setSelectedEmbedUrl(restaurant.mapsEmbed)}
                                         >
                                             <CardHeader className="p-2">
@@ -142,14 +144,15 @@ export default function DestinationDetails({ placeData }: { placeData: any; }) {
                         {/* Hotels */}
                         <TabsContent value="hotels">
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                                {placeData.hotels.map((hotel: Place, index: number) => (
+                                {selectedDestination.hotels.map((hotel: Place, index: number) => (
                                     hotel.imageUrl &&
-                                    <div 
-                                        key={hotel.id} 
+                                    <div
+                                        key={hotel.id}
                                         className="relative group"
                                     >
                                         <Card
-                                            className="cursor-pointer hover:bg-gray-100 transition"
+                                            className={`cursor-pointer hover:bg-gray-100 transition 
+                                                ${isPlaceSaved(hotel.id) ? ' border border-green-400' : ''}`}
                                             onClick={() => setSelectedEmbedUrl(hotel.mapsEmbed)}
                                         >
                                             <CardHeader className="p-2">

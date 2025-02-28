@@ -1,11 +1,11 @@
 
-import PlacesSearch from "./components/PlacesSearch";
-import WeatherTravel from "./components/WeatherTravel";
+import PlacesSearch from "../components/PlacesSearch";
+import FindDestinations from "../components/FindDestinations";
 export default function Home() {
   return (
     <main>
       {/* <PlacesSearch /> */}
-      <WeatherTravel />
+      <FindDestinations />
     </main>
   );
 }

@@ -6,19 +6,23 @@ export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const weatherType = searchParams.get("weather");
+        const attractionType = searchParams.get("attraction"); // New parameter
 
-        if (!weatherType) {
-            return NextResponse.json({ error: "Missing weather type" }, { status: 400 });
+        if (!weatherType || !attractionType) {
+            return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
         }
 
-        const prompt = `Give me 10 ${weatherType} travel destinations as a numbered list in this format: "City, Country". Do not include anything else.`;
+        const prompt = `Give me 10 travel destinations that match the following criteria:
+        - Weather: ${weatherType}
+        - Type of attractions: ${attractionType}
+        List them in this format: "City, Country".`;
 
         // Generate response using OpenAI SDK
         const result = await generateText({
             model: openai("gpt-3.5-turbo"),
             system: "You are a travel expert. Provide only a list of destinations with city and country names.",
             prompt,
-            maxTokens: 100, // Allow a slightly longer response
+            maxTokens: 100, 
         });
 
         // Extract the text output
@@ -26,7 +30,7 @@ export async function GET(req: Request) {
 
         // Split the response correctly by line and remove numbers
         const placesArray = placesText
-            .split("\n") // Split by new lines
+            .split("\n") 
             .map(line => line.replace(/^\d+\.\s*/, "").trim()) // Remove numbering
             .map(place => {
                 const [city, country] = place.split(",").map(s => s.trim()); // Ensure proper splitting

@@ -3,16 +3,19 @@ import { NextResponse } from "next/server";
 const GOOGLE_PLACES_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 export async function GET(req: Request) {
+    console.log("from google-destinations:::", req.url);
     try {
         const { searchParams } = new URL(req.url);
         const city = searchParams.get("city");
+        const country = searchParams.get("country");
 
-        if (!city) {
-            return NextResponse.json({ error: "Missing city parameter" }, { status: 400 });
+        if (!city || !country) {
+            return NextResponse.json({ error: "Missing city or country parameter" }, { status: 400 });
         }
+        const locationQuery = `${city}, ${country}`;
 
         // Search for a place matching the city name
-        const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(city)}&key=${GOOGLE_PLACES_API_KEY}`;
+        const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(locationQuery)}&key=${GOOGLE_PLACES_API_KEY}`;
         const searchResponse = await fetch(searchUrl);
         const searchData = await searchResponse.json();
 

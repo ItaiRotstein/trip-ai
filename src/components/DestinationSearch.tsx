@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/shadcn/dropdown-menu";
 import { Button } from "@/components/shadcn/button";
 
@@ -11,45 +12,24 @@ interface Destination {
     imageUrl?: string;
 }
 
-export default function FindDestinations() {
+export default function DestinationSearch() {
+    const searchParams = useSearchParams();
     const [weatherType, setWeatherType] = useState("");
     const [attractionType, setAttractionType] = useState(""); 
-    const [destinations, setDestinations] = useState<Destination[]>([]);
-    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
-    const findDestinations = async () => {
+    useEffect(() => {
+        const weather = searchParams.get("weather");
+        const attraction = searchParams.get("attraction");
+        if (weather) setWeatherType(weather);
+        if (attraction) setAttractionType(attraction);
+    }, [searchParams]);
+
+    const handleSearch = () => {
         if (!weatherType || !attractionType) return;
-
-        setLoading(true);
-        try {
-            const response = await fetch(`/api/openai-destinations?weather=${weatherType}&attraction=${attractionType}`);
-            const data = await response.json();
-            const places: Destination[] = data.places.map((place: { city: string; country: string }) => ({
-                city: place.city,
-                country: place.country,
-                imageUrl: undefined,
-            }));
-            setDestinations(places);
-
-            // Fetch images for each destination
-            places.forEach(async (destination, index) => {
-                const imageResponse = await fetch(`/api/google-destinations?city=${destination.city}&country=${destination.country}`);
-                const imageData = await imageResponse.json();
-                if (imageData.imageUrl) {
-                    setDestinations((prevDestinations) => {
-                        const newDestinations = [...prevDestinations];
-                        newDestinations[index] = { ...newDestinations[index], imageUrl: imageData.imageUrl };
-                        return newDestinations;
-                    });
-                }
-            });
-        } catch (error) {
-            console.error("Error fetching destinations:", error);
-        } finally {
-            setLoading(false);
-        }
+        router.push(`/search?weather=${weatherType}&attraction=${attractionType}`);
     };
-    console.log("destinations from find destinations", destinations);
+
     return (
         <div className="p-4">
             <h2 className="text-xl font-semibold mb-2">What kind of weather do you prefer?</h2>
@@ -62,6 +42,11 @@ export default function FindDestinations() {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
+                    {weatherType && (
+                        <DropdownMenuItem onClick={() => setWeatherType("")}>
+                            ❌ Clear selection
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={() => setWeatherType("tropical")}>
                         🌴 Tropical (Hot & Humid)
                     </DropdownMenuItem>
@@ -84,6 +69,11 @@ export default function FindDestinations() {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
+                    {attractionType && (
+                        <DropdownMenuItem onClick={() => setAttractionType("")}>
+                            ❌ Clear selection
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={() => setAttractionType("cultural")}>
                         🏛️ Cultural & Historical
                     </DropdownMenuItem>
@@ -112,33 +102,9 @@ export default function FindDestinations() {
             </DropdownMenu>
 
             {/* Search Button */}
-            <Button className="mt-4" onClick={findDestinations} disabled={!weatherType || !attractionType}>
+            <Button className="mt-4" onClick={handleSearch} disabled={!weatherType || !attractionType}>
                 Find Destinations
             </Button>
-
-            {loading && <p className="mt-4">Loading...</p>}
-
-            {destinations.length > 0 && (
-                <>
-                    <h3 className="text-lg font-semibold mt-6">Recommended Destinations:</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                        {destinations.map((place, index) => (
-                            <Link
-                                key={place.city + index}
-                                href={`/destination/${place.city?.toLowerCase().replace(/ /g, "-")}-${place.country?.toLowerCase().replace(/ /g, "-")}`}
-                                className="p-2 border rounded-lg shadow hover:bg-gray-100 transition"
-                            >
-                                <h4 className="text-lg font-semibold">{place.city}, {place.country}</h4>
-                                {place.imageUrl ? (
-                                    <img src={place.imageUrl} alt={place.city} className="w-full h-40 object-cover rounded-lg mt-2" />
-                                ) : (
-                                    <p className="text-sm text-gray-500">Loading image...</p>
-                                )}
-                            </Link>
-                        ))}
-                    </div>
-                </>
-            )}
         </div>
     );
 }

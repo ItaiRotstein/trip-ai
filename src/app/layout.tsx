@@ -3,6 +3,7 @@ import { Rubik } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import { SavedPlacesProvider } from '@/context/SavedPlacesContext';
+import DestinationSearch from "@/components/DestinationSearch";
 const rubik = Rubik({
   subsets: ["latin"],
 });
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body className={`${rubik.className} antialiased`}>
         <SavedPlacesProvider>
           <Header />
+          <DestinationSearch />
           {children}
         </SavedPlacesProvider>
       </body>

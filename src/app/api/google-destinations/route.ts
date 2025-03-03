@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const GOOGLE_PLACES_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 export async function GET(req: Request) {
-    console.log("from google-destinations:::", req.url);
+
     try {
         const { searchParams } = new URL(req.url);
         const city = searchParams.get("city");
@@ -26,10 +26,21 @@ export async function GET(req: Request) {
         const place = searchData.results[0]; // Take the first result
         const photoReference = place.photos?.[0]?.photo_reference;
 
-        // Construct the image URL if a photo is available
+        // Construct and validate the image URL if a photo is available
         let imageUrl = null;
         if (photoReference) {
             imageUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photoReference}&key=${GOOGLE_PLACES_API_KEY}`;
+            
+            // Validate that the image URL is accessible
+            try {
+                const imageResponse = await fetch(imageUrl);
+                if (!imageResponse.ok) {
+                    return NextResponse.json({ error: "Image not available" }, { status: 404 });
+                }
+            } catch (error) {
+                console.error("Error validating image URL:", error);
+                return NextResponse.json({ error: "Failed to validate image" }, { status: 500 });
+            }
         }
 
         return NextResponse.json({

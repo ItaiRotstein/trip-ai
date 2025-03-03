@@ -11,19 +11,60 @@ interface Place {
     name: string;
     imageUrl: string;
     mapsEmbed: string;
+    type: 'place' | 'restaurant' | 'hotel';
 }
 
 export default function DestinationDetails({ selectedDestination }: { selectedDestination: any; }) {
     const [selectedEmbedUrl, setSelectedEmbedUrl] = useState<string>(selectedDestination.destinationEmbedUrl);
-    const { savedPlaces, addPlace, removePlace } = useSavedPlaces();
+    const { savedPlaces, addPlace, removePlace, addDestination } = useSavedPlaces();
+
+    const isDestinationSaved = () => {
+        const destinationName = `${selectedDestination.city}, ${selectedDestination.country}`;
+        return savedPlaces.some(d => d.destinationName === destinationName);
+    };
+
+    const handleDestinationAction = () => {
+        const destinationName = `${selectedDestination.city}, ${selectedDestination.country}`;
+        if (isDestinationSaved()) {
+            removePlace(destinationName, '');
+        } else {
+            addDestination(selectedDestination);
+        }
+    };
 
     const isPlaceSaved = (placeId: string) => {
-        return savedPlaces.some(place => place.id === placeId);
+        const destinationName = `${selectedDestination.city}, ${selectedDestination.country}`;
+        const destinationPlaces = savedPlaces.find(d => d.destinationName === destinationName);
+        return destinationPlaces?.places.some(place => place.id === placeId) ?? false;
+    };
+
+    const handlePlaceAction = (place: Place, type: 'place' | 'restaurant' | 'hotel') => {
+        if (isPlaceSaved(place.id)) {
+            const destinationName = `${selectedDestination.city}, ${selectedDestination.country}`;
+            removePlace(destinationName, place.id);
+        } else {
+            addPlace(selectedDestination, {
+                ...place,
+                type
+            });
+        }
     };
 
     return (
         <section className="p-4">
-            <h2 className="text-2xl font-semibold mt-4">Explore {selectedDestination.city}</h2>
+            <div className="flex items-center gap-2 mt-4">
+                <button
+                    onClick={handleDestinationAction}
+                    className="hover:scale-110 transition-transform"
+                >
+                    {isDestinationSaved() ? (
+                        <FaCheck className="text-green-400" size={20} />
+                    ) : (
+                        <FaPlus className="text-gray-400 hover:text-green-400" size={20} />
+                    )}
+                </button>
+                <h2 className="text-2xl font-semibold">Explore {selectedDestination.city}</h2>
+            </div>
 
             <div className="flex flex-col md:flex-row gap-4">
                 {/* Google Maps Embed Section */}
@@ -74,11 +115,7 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                if (isPlaceSaved(place.id)) {
-                                                    removePlace(place.id);
-                                                } else {
-                                                    addPlace(place);
-                                                }
+                                                handlePlaceAction(place, 'place');
                                             }}
                                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
@@ -122,11 +159,7 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                if (isPlaceSaved(restaurant.id)) {
-                                                    removePlace(restaurant.id);
-                                                } else {
-                                                    addPlace(restaurant);
-                                                }
+                                                handlePlaceAction(restaurant, 'restaurant');
                                             }}
                                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
@@ -170,11 +203,7 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                if (isPlaceSaved(hotel.id)) {
-                                                    removePlace(hotel.id);
-                                                } else {
-                                                    addPlace(hotel);
-                                                }
+                                                handlePlaceAction(hotel, 'hotel');
                                             }}
                                             className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                         >

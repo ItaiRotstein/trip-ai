@@ -7,6 +7,7 @@ export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const city = searchParams.get("city");
+        const country = searchParams.get("country");    
 
         if (!city) {
             return NextResponse.json({ error: "Missing city parameter" }, { status: 400 });
@@ -82,6 +83,7 @@ export async function GET(req: Request) {
 
         return NextResponse.json({
             city,
+            country,
             destinationEmbedUrl,
             coordinates,
             images: imageReferences,

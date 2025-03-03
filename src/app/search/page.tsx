@@ -36,7 +36,7 @@ export default function SearchPage() {
 
                 // Fetch images for each destination
                 places.forEach(async (destination, index) => {
-                    const imageResponse = await fetch(`/api/google-destinations?city=${destination.city}&country=${destination.country}`);
+                    const imageResponse = await fetch(`/api/google-destinations?city=${destination.city}&country=${destination.country || ''}`);
                     const imageData = await imageResponse.json();
                     if (imageData.imageUrl) {
                         setDestinations((prevDestinations) => {

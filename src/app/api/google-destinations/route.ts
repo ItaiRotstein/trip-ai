@@ -8,11 +8,12 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const city = searchParams.get("city");
         const country = searchParams.get("country");
-
-        if (!city || !country) {
+        console.log("country from api", country);
+        
+        if (!city) {
             return NextResponse.json({ error: "Missing city or country parameter" }, { status: 400 });
         }
-        const locationQuery = `${city}, ${country}`;
+        const locationQuery = `${city}, ${country && country}`;
 
         // Search for a place matching the city name
         const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(locationQuery)}&key=${GOOGLE_PLACES_API_KEY}`;

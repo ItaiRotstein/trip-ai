@@ -8,19 +8,22 @@ import { Button } from "@/components/shadcn/button";
 export default function DestinationSearch() {
     const searchParams = useSearchParams();
     const [weatherType, setWeatherType] = useState("");
-    const [attractionType, setAttractionType] = useState(""); 
+    const [attractionType, setAttractionType] = useState("");
+    const [travelGroup, setTravelGroup] = useState("");
     const router = useRouter();
 
     useEffect(() => {
         const weather = searchParams.get("weather");
         const attraction = searchParams.get("attraction");
+        const group = searchParams.get("group");
         if (weather) setWeatherType(weather);
         if (attraction) setAttractionType(attraction);
+        if (group) setTravelGroup(group);
     }, [searchParams]);
 
     const handleSearch = () => {
-        if (!weatherType || !attractionType) return;
-        router.push(`/search?weather=${weatherType}&attraction=${attractionType}`);
+        if (!weatherType || !attractionType || !travelGroup) return;
+        router.push(`/search?weather=${weatherType}&attraction=${attractionType}&group=${travelGroup}`);
     };
 
     return (
@@ -94,11 +97,38 @@ export default function DestinationSearch() {
                 </DropdownMenuContent>
             </DropdownMenu>
 
+            <h2 className="text-xl font-semibold mt-4 mb-2 text-center">Who are you traveling with?</h2>
+
+            {/* Travel Group Dropdown */}
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-64">
+                        {travelGroup ? travelGroup.replace('-', ' ').charAt(0).toUpperCase() + travelGroup.slice(1) : "Select Travel Group"}
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                    {travelGroup && (
+                        <DropdownMenuItem onClick={() => setTravelGroup("")}>
+                            ❌ Clear selection
+                        </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={() => setTravelGroup("solo")}>
+                        👤 Solo Travel
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTravelGroup("friends")}>
+                        👥 With Friends
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTravelGroup("family")}>
+                        👨‍👩‍👧‍👦 Family with Children
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Search Button */}
             <Button 
                 className="mt-8 w-64" 
                 onClick={handleSearch} 
-                disabled={!weatherType || !attractionType}
+                disabled={!weatherType || !attractionType || !travelGroup}
             >
                 Find Destinations
             </Button>

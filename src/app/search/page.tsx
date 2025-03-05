@@ -14,17 +14,18 @@ export default function SearchPage() {
     const searchParams = useSearchParams();
     const weatherType = searchParams.get("weather");
     const attractionType = searchParams.get("attraction");
+    const travelGroup = searchParams.get("group");
 
     const [destinations, setDestinations] = useState<Destination[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchDestinations = async () => {
-            if (!weatherType || !attractionType) return;
+            if (!weatherType || !attractionType || !travelGroup) return;
 
             setLoading(true);
             try {
-                const response = await fetch(`/api/openai-destinations?weather=${weatherType}&attraction=${attractionType}`);
+                const response = await fetch(`/api/openai-destinations?weather=${weatherType}&attraction=${attractionType}&group=${travelGroup}`);
                 const data = await response.json();
                 const places: Destination[] = data.places.map((place: { city: string; country: string; }) => ({
                     city: place.city,
@@ -53,7 +54,7 @@ export default function SearchPage() {
         };
 
         fetchDestinations();
-    }, [weatherType, attractionType]);
+    }, [weatherType, attractionType, travelGroup]);
 
     return (
         <div className="p-4">

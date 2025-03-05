@@ -6,15 +6,18 @@ export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const weatherType = searchParams.get("weather");
-        const attractionType = searchParams.get("attraction"); // New parameter
+        const attractionType = searchParams.get("attraction");
+        const travelGroup = searchParams.get("group");
 
-        if (!weatherType || !attractionType) {
+        if (!weatherType || !attractionType || !travelGroup) {
             return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
         }
 
+        const familyRequirement = travelGroup === "family" ? "\n- Must be child-friendly destinations" : "";
+        
         const prompt = `Give me 10 travel destinations that match the following criteria:
         - Weather: ${weatherType}
-        - Type of attractions: ${attractionType}
+        - Type of attractions: ${attractionType}${familyRequirement}
         List them in this format: "City, Country".`;
 
         // Generate response using OpenAI SDK

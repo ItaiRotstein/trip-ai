@@ -1,7 +1,8 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import Cookies from 'js-cookie';
+import { useAuth } from './AuthContext';
+import { toast } from 'sonner';
 
 interface Place {
     id: string;
@@ -38,94 +39,111 @@ const SavedPlacesContext = createContext<SavedPlacesContextType | undefined>(und
 
 export function SavedPlacesProvider({ children }: { children: ReactNode }) {
     const [savedPlaces, setSavedPlaces] = useState<DestinationPlaces[]>([]);
+    const { isAuthenticated } = useAuth();
+
+    const getAuthHeader = () => {
+        const token = localStorage.getItem('token-tripai');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+    };
 
     useEffect(() => {
-        // Load saved places from cookies on mount
-        const savedPlacesCookie = Cookies.get('savedPlaces');
-        if (savedPlacesCookie) {
-            setSavedPlaces(JSON.parse(savedPlacesCookie));
+        // Load saved places from API when authenticated
+        if (isAuthenticated) {
+            fetchSavedPlaces();
+        } else {
+            setSavedPlaces([]);
         }
-    }, []);
+    }, [isAuthenticated]);
 
-    const addPlace = (destination: Destination, place: Place) => {
-        setSavedPlaces(prev => {
-            const destinationName = `${destination.city}, ${destination.country}`;
-            const destinationIndex = prev.findIndex(d => d.destinationName === destinationName);
-            let updated;
+    const fetchSavedPlaces = async () => {
+        try {
+            const response = await fetch('/api/user/saved-places', {
+                headers: getAuthHeader()
+            });
+            if (!response.ok) throw new Error('Failed to fetch saved places');
+            const data = await response.json();
+            setSavedPlaces(data.savedPlaces);
+        } catch (error) {
+            console.error('Error fetching saved places:', error);
+            toast.error('Failed to load saved places');
+        }
+    };
 
-            if (destinationIndex === -1) {
-                // Create new destination entry
-                updated = [...prev, { 
-                    destination,
-                    destinationName,
-                    destinationId: destination.id,
-                    places: [place] 
-                }];
-            } else {
-                // Add to existing destination
-                updated = prev.map((dest, index) => {
-                    if (index === destinationIndex) {
-                        return {
-                            ...dest,
-                            places: [...dest.places, place]
-                        };
-                    }
-                    return dest;
-                });
-            }
+    const addPlace = async (destination: Destination, place: Place) => {
+        try {
+            const response = await fetch('/api/user/saved-places', {
+                method: 'POST',
+                headers: getAuthHeader(),
+                body: JSON.stringify({ destination, place }),
+            });
+
+            if (!response.ok) throw new Error('Failed to save place');
             
-            Cookies.set('savedPlaces', JSON.stringify(updated));
-            return updated;
-        });
+            const data = await response.json();
+            setSavedPlaces(data.savedPlaces);
+            toast.success('Place saved successfully');
+        } catch (error) {
+            console.error('Error saving place:', error);
+            toast.error('Failed to save place');
+        }
     };
 
-    const removePlace = (destinationName: string, placeId: string) => {
-        setSavedPlaces(prev => {
-            let updated;
-            if (placeId === '') {
-                // Remove entire destination
-                updated = prev.filter(dest => dest.destinationName !== destinationName);
-            } else {
-                // Remove specific place
-                updated = prev.map(dest => {
-                    if (dest.destinationName === destinationName) {
-                        return {
-                            ...dest,
-                            places: dest.places.filter(place => place.id !== placeId)
-                        };
-                    }
-                    return dest;
-                }).filter(dest => dest?.places?.length > 0); // Remove empty destinations
-            }
+    const removePlace = async (destinationName: string, placeId: string) => {
+        try {
+            const response = await fetch('/api/user/saved-places', {
+                method: 'DELETE',
+                headers: getAuthHeader(),
+                body: JSON.stringify({ destinationName, placeId }),
+            });
+
+            if (!response.ok) throw new Error('Failed to remove place');
             
-            Cookies.set('savedPlaces', JSON.stringify(updated));
-            return updated;
-        });
+            const data = await response.json();
+            setSavedPlaces(data.savedPlaces);
+            toast.success('Place removed successfully');
+        } catch (error) {
+            console.error('Error removing place:', error);
+            toast.error('Failed to remove place');
+        }
     };
 
-    const clearEmptyDestinations = () => {
-        setSavedPlaces(prev => {
-            const updated = prev.filter(dest => dest.places.length > 0);
-            Cookies.set('savedPlaces', JSON.stringify(updated));
-            return updated;
-        });
+    const clearEmptyDestinations = async () => {
+        try {
+            const response = await fetch('/api/user/saved-places/clear-empty', {
+                method: 'DELETE',
+                headers: getAuthHeader(),
+            });
+
+            if (!response.ok) throw new Error('Failed to clear empty destinations');
+            
+            const data = await response.json();
+            setSavedPlaces(data.savedPlaces);
+        } catch (error) {
+            console.error('Error clearing empty destinations:', error);
+            toast.error('Failed to clear empty destinations');
+        }
     };
 
-    const addDestination = (destination: Destination) => {
-        setSavedPlaces(prev => {
-            const destinationName = `${destination.city}, ${destination.country}`;
-            if (prev.some(d => d.destinationName === destinationName)) {
-                return prev; // Destination already exists
-            }
-            const updated = [...prev, { 
-                destination,
-                destinationName,
-                destinationId: destination.id,
-                places: [] 
-            }];
-            Cookies.set('savedPlaces', JSON.stringify(updated));
-            return updated;
-        });
+    const addDestination = async (destination: Destination) => {
+        try {
+            const response = await fetch('/api/user/saved-places/destination', {
+                method: 'POST',
+                headers: getAuthHeader(),
+                body: JSON.stringify({ destination }),
+            });
+
+            if (!response.ok) throw new Error('Failed to add destination');
+            
+            const data = await response.json();
+            setSavedPlaces(data.savedPlaces);
+            toast.success('Destination added successfully');
+        } catch (error) {
+            console.error('Error adding destination:', error);
+            toast.error('Failed to add destination');
+        }
     };
 
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/shadcn/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/shadcn/card";
 import { FaPlus, FaCheck } from 'react-icons/fa';
@@ -12,6 +12,53 @@ interface Place {
     imageUrl: string;
     mapsEmbed: string;
     type: 'place' | 'restaurant' | 'hotel';
+}
+
+function PlaceCards({ places, onSelect, onAction, isPlaceSaved }: {
+    places: Place[];
+    onSelect: (url: string) => void;
+    onAction: (place: Place, type: 'place' | 'restaurant' | 'hotel') => void;
+    isPlaceSaved: (id: string) => boolean;
+}) {
+    return (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+            {places.map((place: Place) => (
+                place.imageUrl &&
+                <div key={place.id} className="relative group">
+                    <Card
+                        className={`cursor-pointer hover:bg-gray-100 transition 
+                            ${isPlaceSaved(place.id) ? ' border border-green-400' : ''}`}
+                        onClick={() => onSelect(place.mapsEmbed)}
+                    >
+                        <CardHeader className="p-2">
+                            <CardTitle className="text-sm">{place.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-2">
+                            <img
+                                src={place.imageUrl}
+                                alt={place.name}
+                                className="w-full h-32 object-cover rounded-lg"
+                                referrerPolicy="no-referrer"
+                            />
+                        </CardContent>
+                    </Card>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onAction(place, 'place');
+                        }}
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                        {isPlaceSaved(place.id) ? (
+                            <FaCheck className="text-green-400" size={20} />
+                        ) : (
+                            <FaPlus className="text-white hover:text-green-400" size={20} />
+                        )}
+                    </button>
+                </div>
+            ))}
+        </div>
+    );
 }
 
 export default function DestinationDetails({ selectedDestination }: { selectedDestination: any; }) {
@@ -88,138 +135,77 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
 
                         {/* Places to Visit */}
                         <TabsContent value="places">
-                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                                {selectedDestination.placesToVisit.map((place: Place, index: number) => (
-                                    place.imageUrl &&
-                                    <div
-                                        key={place.id}
-                                        className="relative group"
-                                    >
-                                        <Card
-                                            className={`cursor-pointer hover:bg-gray-100 transition 
-                                                ${isPlaceSaved(place.id) ? ' border border-green-400' : ''}`}
-                                            onClick={() => setSelectedEmbedUrl(place.mapsEmbed)}
-                                        >
-                                            <CardHeader className="p-2">
-                                                <CardTitle className="text-sm">{place.name}</CardTitle>
-                                            </CardHeader>
-                                            <CardContent className="p-2">
-                                                <img
-                                                    src={place.imageUrl}
-                                                    alt={place.name}
-                                                    className="w-full h-32 object-cover rounded-lg"
-                                                    referrerPolicy="no-referrer"
-                                                />
-                                            </CardContent>
-                                        </Card>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handlePlaceAction(place, 'place');
-                                            }}
-                                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            {isPlaceSaved(place.id) ? (
-                                                <FaCheck className="text-green-400" size={20} />
-                                            ) : (
-                                                <FaPlus className="text-white hover:text-green-400" size={20} />
-                                            )}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
+                            <Suspense fallback={
+                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                                    {[...Array(6)].map((_, i) => (
+                                        <PlaceCardSkeleton key={i} />
+                                    ))}
+                                </div>
+                            }>
+                                <PlaceCards 
+                                    places={selectedDestination.placesToVisit}
+                                    onSelect={setSelectedEmbedUrl}
+                                    onAction={(place) => handlePlaceAction(place, 'place')}
+                                    isPlaceSaved={isPlaceSaved}
+                                />
+                            </Suspense>
                         </TabsContent>
 
                         {/* Restaurants */}
                         <TabsContent value="restaurants">
-                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                                {selectedDestination.restaurants.map((restaurant: Place, index: number) => (
-                                    restaurant.imageUrl &&
-                                    <div
-                                        key={restaurant.id}
-                                        className="relative group"
-                                    >
-                                        <Card
-                                            className={`cursor-pointer hover:bg-gray-100 transition 
-                                                ${isPlaceSaved(restaurant.id) ? ' border border-green-400' : ''}`}
-                                            onClick={() => setSelectedEmbedUrl(restaurant.mapsEmbed)}
-                                        >
-                                            <CardHeader className="p-2">
-                                                <CardTitle className="text-sm">{restaurant.name}</CardTitle>
-                                            </CardHeader>
-                                            <CardContent className="p-2">
-                                                <img
-                                                    src={restaurant.imageUrl}
-                                                    alt={restaurant.name}
-                                                    className="w-full h-32 object-cover rounded-lg"
-                                                    referrerPolicy="no-referrer"
-                                                />
-                                            </CardContent>
-                                        </Card>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handlePlaceAction(restaurant, 'restaurant');
-                                            }}
-                                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            {isPlaceSaved(restaurant.id) ? (
-                                                <FaCheck className="text-green-400" size={20} />
-                                            ) : (
-                                                <FaPlus className="text-white hover:text-green-400" size={20} />
-                                            )}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
+                            <Suspense fallback={
+                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                                    {[...Array(6)].map((_, i) => (
+                                        <PlaceCardSkeleton key={i} />
+                                    ))}
+                                </div>
+                            }>
+                                <PlaceCards 
+                                    places={selectedDestination.restaurants}
+                                    onSelect={setSelectedEmbedUrl}
+                                    onAction={(place) => handlePlaceAction(place, 'restaurant')}
+                                    isPlaceSaved={isPlaceSaved}
+                                />
+                            </Suspense>
                         </TabsContent>
 
                         {/* Hotels */}
                         <TabsContent value="hotels">
-                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                                {selectedDestination.hotels.map((hotel: Place, index: number) => (
-                                    hotel.imageUrl &&
-                                    <div
-                                        key={hotel.id}
-                                        className="relative group"
-                                    >
-                                        <Card
-                                            className={`cursor-pointer hover:bg-gray-100 transition 
-                                                ${isPlaceSaved(hotel.id) ? ' border border-green-400' : ''}`}
-                                            onClick={() => setSelectedEmbedUrl(hotel.mapsEmbed)}
-                                        >
-                                            <CardHeader className="p-2">
-                                                <CardTitle className="text-sm">{hotel.name}</CardTitle>
-                                            </CardHeader>
-                                            <CardContent className="p-2">
-                                                <img
-                                                    src={hotel.imageUrl}
-                                                    alt={hotel.name}
-                                                    className="w-full h-32 object-cover rounded-lg"
-                                                    referrerPolicy="no-referrer"
-                                                />
-                                            </CardContent>
-                                        </Card>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handlePlaceAction(hotel, 'hotel');
-                                            }}
-                                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            {isPlaceSaved(hotel.id) ? (
-                                                <FaCheck className="text-green-400" size={20} />
-                                            ) : (
-                                                <FaPlus className="text-white hover:text-green-400" size={20} />
-                                            )}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
+                            <Suspense fallback={
+                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                                    {[...Array(6)].map((_, i) => (
+                                        <PlaceCardSkeleton key={i} />
+                                    ))}
+                                </div>
+                            }>
+                                <PlaceCards 
+                                    places={selectedDestination.hotels}
+                                    onSelect={setSelectedEmbedUrl}
+                                    onAction={(place) => handlePlaceAction(place, 'hotel')}
+                                    isPlaceSaved={isPlaceSaved}
+                                />
+                            </Suspense>
                         </TabsContent>
                     </Tabs>
                 </div>
             </div>
         </section>
+    );
+}
+
+function PlaceCardSkeleton() {
+    return (
+        <div className="relative">
+            <div className="border rounded-lg p-2 animate-pulse">
+                <div className="p-2">
+                    {/* Title skeleton */}
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                </div>
+                <div className="p-2">
+                    {/* Image skeleton */}
+                    <div className="w-full h-32 bg-gray-200 rounded-lg"></div>
+                </div>
+            </div>
+        </div>
     );
 }

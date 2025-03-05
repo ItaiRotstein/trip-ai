@@ -1,16 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/shadcn/dropdown-menu";
 import { Button } from "@/components/shadcn/button";
-
-interface Destination {
-    city: string;
-    country: string;
-    imageUrl?: string;
-}
 
 export default function DestinationSearch() {
     const searchParams = useSearchParams();
@@ -31,10 +24,10 @@ export default function DestinationSearch() {
     };
 
     return (
-        <div className="p-4">
-            <h2 className="text-xl font-semibold mb-2">What kind of weather do you prefer?</h2>
+        <div className="p-4 flex flex-col items-center">
+            <h2 className="text-xl font-semibold mb-2 text-center">What kind of weather do you prefer?</h2>
 
-            {/* Weather Weather Dropdown */}
+            {/* Weather Dropdown */}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="w-64">
@@ -59,7 +52,7 @@ export default function DestinationSearch() {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <h2 className="text-xl font-semibold mt-4 mb-2">What are your favorite types of attractions?</h2>
+            <h2 className="text-xl font-semibold mt-4 mb-2 text-center">What are your favorite types of attractions?</h2>
 
             {/* Attraction Type Dropdown */}
             <DropdownMenu>
@@ -102,7 +95,11 @@ export default function DestinationSearch() {
             </DropdownMenu>
 
             {/* Search Button */}
-            <Button className="mt-4" onClick={handleSearch} disabled={!weatherType || !attractionType}>
+            <Button 
+                className="mt-8 w-64" 
+                onClick={handleSearch} 
+                disabled={!weatherType || !attractionType}
+            >
                 Find Destinations
             </Button>
         </div>

@@ -3,7 +3,8 @@ import { Rubik } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import { SavedPlacesProvider } from '@/context/SavedPlacesContext';
-import DestinationSearch from "@/components/DestinationSearch";
+import { AuthProvider } from '@/context/AuthContext';
+import { Toaster } from "sonner";
 const rubik = Rubik({
   subsets: ["latin"],
 });
@@ -21,11 +22,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${rubik.className} antialiased`}>
-        <SavedPlacesProvider>
-          <Header />
-          <DestinationSearch />
-          {children}
-        </SavedPlacesProvider>
+        <AuthProvider>
+          <SavedPlacesProvider>
+            <Header />
+
+            {children}
+          </SavedPlacesProvider>
+        </AuthProvider>
+        <Toaster />
       </body>
     </html>
   );

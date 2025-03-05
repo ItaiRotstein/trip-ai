@@ -1,11 +1,16 @@
+'use client';
+
 import Navbar from "./Navbar";
 import { Button } from "@/components/shadcn/button";
 import Link from "next/link";
 import { FaBookmark } from "react-icons/fa";
 import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/shadcn/sheet";
 import SelectedPlacesDrawer from "@/components/SelectedPlacesDrawer";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
+    const { isAuthenticated, logout } = useAuth();
+
     return (
         <header className="px-4 py-2 flex justify-between items-center">
             <Link href="/">
@@ -20,14 +25,27 @@ export default function Header() {
                         </Button>
                     </SheetTrigger>
                     <SheetContent>
-                        <SheetTitle>Saved Places</SheetTitle>
+                        <SheetTitle className="sr-only">Saved Places</SheetTitle>
                         <SelectedPlacesDrawer />
                     </SheetContent>
                 </Sheet>
-                <img src="/user-icon.svg" alt="Trip -AI" className="w-9 h-9" />
-                <Button asChild>
-                    <Link href="/login">Login</Link>
-                </Button>
+                {isAuthenticated ? (
+                    <>
+                        <img src="/user-icon.svg" alt="Trip -AI" className="w-9 h-9" />
+                        <Button variant="outline" onClick={logout}>
+                            Logout
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button variant="outline" asChild>
+                            <Link href="/login">Login</Link>
+                        </Button>
+                        <Button asChild>
+                            <Link href="/register">Sign Up</Link>
+                        </Button>
+                    </>
+                )}
             </div>
         </header>
     );

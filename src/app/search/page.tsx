@@ -1,10 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import DestinationSearch from "@/components/DestinationSearch";
-
 interface Destination {
     city: string;
     country: string;
@@ -58,26 +57,28 @@ export default function SearchPage() {
 
     return (
         <div className="p-4">
-            {loading && <p className="mt-4">Loading...</p>}
-
+            <DestinationSearch />
             {destinations.length > 0 && (
                 <>
                     <h3 className="text-lg font-semibold mt-6">Recommended Destinations:</h3>
+                    <Suspense fallback={
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                            {[...Array(6)].map((_, i) => (
+                                <DestinationCardSkeleton key={i} />
+                            ))}
+                        </div>
+                    }>
+                        <DestinationCards destinations={destinations} />
+                    </Suspense>
+                </>
+            )}
+
+            {loading && !destinations.length && (
+                <>
+                    <h3 className="text-lg font-semibold mt-6">Loading Destinations...</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                        {destinations.map((place, index) => (
-                            place.imageUrl &&
-                            <Link
-                                key={place.city + index}
-                                href={`/destination/?city=${place.city.toLowerCase().replace(/ /g, "-")}&country=${place.country?.toLowerCase().replace(/ /g, "-")}`}
-                                className="p-2 border rounded-lg shadow hover:bg-gray-100 transition"
-                            >
-                                <h4 className="text-lg font-semibold">{place.city}{place.country ? ", " : ""} {place.country}</h4>
-                                {place.imageUrl ? (
-                                    <img src={place.imageUrl} alt={place.city} className="w-full h-40 object-cover rounded-lg mt-2" />
-                                ) : (
-                                    <p className="text-sm text-gray-500">Loading image...</p>
-                                )}
-                            </Link>
+                        {[...Array(6)].map((_, i) => (
+                            <DestinationCardSkeleton key={i} />
                         ))}
                     </div>
                 </>
@@ -85,3 +86,34 @@ export default function SearchPage() {
         </div>
     );
 } 
+
+function DestinationCards({ destinations }: { destinations: Destination[] }) {
+    return (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+            {destinations.map((place, index) => (
+                place.imageUrl &&
+                <Link
+                    key={place.city + index}
+                    href={`/destination/?city=${place.city.toLowerCase().replace(/ /g, "-")}&country=${place.country?.toLowerCase().replace(/ /g, "-")}`}
+                    className="p-2 border rounded-lg shadow hover:bg-gray-100 transition"
+                >
+                    <h4 className="text-lg font-semibold">{place.city}{place.country ? ", " : ""} {place.country}</h4>
+                    <img 
+                        src={place.imageUrl} 
+                        alt={place.city} 
+                        className="w-full h-40 object-cover rounded-lg mt-2" 
+                    />
+                </Link>
+            ))}
+        </div>
+    );
+}
+
+function DestinationCardSkeleton() {
+    return (
+        <div className="p-2 border rounded-lg shadow animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="w-full h-40 bg-gray-200 rounded-lg"></div>
+        </div>
+    );
+}

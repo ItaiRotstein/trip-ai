@@ -15,12 +15,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check if token exists in localStorage
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token-tripai');
     setIsAuthenticated(!!token);
   }, []);
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('token-tripai');
     setIsAuthenticated(false);
   };
 

@@ -5,6 +5,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/shadcn/ta
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/shadcn/card";
 import { FaPlus, FaCheck } from 'react-icons/fa';
 import { useSavedPlaces } from '@/context/SavedPlacesContext';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from "sonner";
 
 interface Place {
     id: string;
@@ -62,6 +64,7 @@ function PlaceCards({ places, onSelect, onAction, isPlaceSaved }: {
 }
 
 export default function DestinationDetails({ selectedDestination }: { selectedDestination: any; }) {
+    const { isAuthenticated } = useAuth();
     const [selectedEmbedUrl, setSelectedEmbedUrl] = useState<string>(selectedDestination.destinationEmbedUrl);
     const { savedPlaces, addPlace, removePlace, addDestination } = useSavedPlaces();
 
@@ -71,6 +74,11 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
     };
 
     const handleDestinationAction = () => {
+        if (!isAuthenticated) {
+            toast.error("Please log in to save destinations");
+            return;
+        }
+
         const destinationName = `${selectedDestination.city}, ${selectedDestination.country}`;
         if (isDestinationSaved()) {
             removePlace(destinationName, '');
@@ -86,6 +94,11 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
     };
 
     const handlePlaceAction = (place: Place, type: 'place' | 'restaurant' | 'hotel') => {
+        if (!isAuthenticated) {
+            toast.error("Please log in to save places");
+            return;
+        }
+
         if (isPlaceSaved(place.id)) {
             const destinationName = `${selectedDestination.city}, ${selectedDestination.country}`;
             removePlace(destinationName, place.id);

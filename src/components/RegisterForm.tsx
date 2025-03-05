@@ -5,9 +5,12 @@ import { Input } from "@/components/shadcn/input";
 import { Label } from "@/components/shadcn/label";
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from "sonner";
 
 export default function RegisterForm() {
   const router = useRouter();
+  const { setIsAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -48,10 +51,14 @@ export default function RegisterForm() {
         throw new Error(data.message || 'Registration failed');
       }
 
-      localStorage.setItem('token', data.token);
-      router.push('/dashboard');
+      localStorage.setItem('token-tripai', data.token);
+      setIsAuthenticated(true);
+      toast.success('Account created successfully!');
+      router.push('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -95,7 +102,18 @@ export default function RegisterForm() {
         />
       </div>
       <Button className="w-full" type="submit" disabled={isLoading}>
-        {isLoading ? "Loading..." : "Create Account"}
+        {isLoading ? (
+          <span className="inline-flex items-center">
+            Loading
+            <span className="dot-wave">
+              <span className="dot">.</span>
+              <span className="dot">.</span>
+              <span className="dot">.</span>
+            </span>
+          </span>
+        ) : (
+          "Create Account"
+        )}
       </Button>
     </form>
   );

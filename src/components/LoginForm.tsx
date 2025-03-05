@@ -43,7 +43,7 @@ export default function LoginForm() {
         throw new Error(data.message || 'Login failed');
       }
 
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token-tripai', data.token);
       setIsAuthenticated(true);
       
       toast.success('Successfully logged in!');
@@ -84,7 +84,18 @@ export default function LoginForm() {
         />
       </div>
       <Button className="w-full" type="submit" disabled={isLoading}>
-        {isLoading ? "Loading..." : "Login"}
+        {isLoading ? (
+          <span className="inline-flex items-center">
+            Loading
+            <span className="dot-wave">
+              <span className="dot">.</span>
+              <span className="dot">.</span>
+              <span className="dot">.</span>
+            </span>
+          </span>
+        ) : (
+          "Login"
+        )}
       </Button>
     </form>
   );

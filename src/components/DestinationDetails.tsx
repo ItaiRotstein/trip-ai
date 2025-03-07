@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/shadcn/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/shadcn/card";
-import { FaPlus, FaCheck } from 'react-icons/fa';
+import { FaPlus, FaMinus } from 'react-icons/fa';
 import { useSavedPlaces } from '@/context/SavedPlacesContext';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from "sonner";
@@ -71,7 +71,7 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
                     className="hover:scale-110 transition-transform"
                 >
                     {isDestinationSaved() ? (
-                        <FaCheck className="text-green-400" size={20} />
+                        <FaMinus className="text-green-400" size={20} />
                     ) : (
                         <FaPlus className="text-gray-400 hover:text-green-400" size={20} />
                     )}
@@ -202,7 +202,7 @@ function PlaceCards({ places, onSelect, onAction, isPlaceSaved }: {
                         onClick={() => onSelect(place.mapsEmbed)}
                     >
                         <CardHeader className="p-2">
-                            <CardTitle className="text-sm">{place.name}</CardTitle>
+                            <CardTitle className="text-sm w-[90%]">{place.name}</CardTitle>
                         </CardHeader>
                         <CardContent className="p-2">
                             <img
@@ -218,12 +218,12 @@ function PlaceCards({ places, onSelect, onAction, isPlaceSaved }: {
                             e.stopPropagation();
                             onAction(place, 'place');
                         }}
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 transition-opacity"
                     >
                         {isPlaceSaved(place.id) ? (
-                            <FaCheck className="text-green-400" size={20} />
+                            <FaMinus className="text-green-400" size={20} />
                         ) : (
-                            <FaPlus className="text-white hover:text-green-400" size={20} />
+                            <FaPlus className="text-gray-400 hover:text-green-400" size={20} />
                         )}
                     </button>
                 </div>

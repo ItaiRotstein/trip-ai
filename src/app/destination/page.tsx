@@ -1,9 +1,16 @@
 import DestinationDetails from "@/components/DestinationDetails";
 import { notFound } from "next/navigation";
 
-export default async function DestinationPage({ searchParams }: { searchParams: { city?: string; country?: string; }; }) {
-    const { city } = await searchParams;
-    const { country } = await searchParams;
+interface PageProps {
+    searchParams: Promise<{
+        city?: string;
+        country?: string;
+    }>;
+}
+
+export default async function DestinationPage({ searchParams }: PageProps) {
+    const params = await searchParams;
+    const { city, country } = params;
 
     if (!city || !country) {
         return notFound();

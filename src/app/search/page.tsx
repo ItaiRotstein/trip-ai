@@ -58,7 +58,9 @@ export default function SearchPage() {
 
     return (
         <div className="p-4">
-            <DestinationSearch />
+            <Suspense fallback={<div>Loading...</div>}> 
+                <DestinationSearch />
+            </Suspense>
             {destinations.length > 0 && (
                 <>
                     <h3 className="text-lg font-semibold mt-6">Recommended Destinations:</h3>

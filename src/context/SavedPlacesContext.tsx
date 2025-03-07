@@ -112,7 +112,7 @@ export function SavedPlacesProvider({ children }: { children: ReactNode }) {
 
     const clearEmptyDestinations = async () => {
         try {
-            const response = await fetch('/api/user/saved-places/clear-empty', {
+            const response = await fetch('/api/user/saved-places/clear-empty-destination', {
                 method: 'DELETE',
                 headers: getAuthHeader(),
             });
@@ -129,7 +129,7 @@ export function SavedPlacesProvider({ children }: { children: ReactNode }) {
 
     const addDestination = async (destination: Destination) => {
         try {
-            const response = await fetch('/api/user/saved-places/destination', {
+            const response = await fetch('/api/user/saved-places/add-destination', {
                 method: 'POST',
                 headers: getAuthHeader(),
                 body: JSON.stringify({ destination }),

@@ -44,6 +44,7 @@ export default function LoginForm() {
       }
 
       localStorage.setItem('token-tripai', data.token);
+      localStorage.setItem('user-name-tripai', formData.email);
       setIsAuthenticated(true);
       
       toast.success('Successfully logged in!');

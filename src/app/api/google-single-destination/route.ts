@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const GOOGLE_PLACES_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
 const GOOGLE_MAPS_EMBED_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY;
 export async function GET(req: Request) {
-
+    console.log("!!!!!!!!!from google-single-destination!!!!!!!!!");
     try {
         const { searchParams } = new URL(req.url);
         const city = searchParams.get("city");

@@ -64,7 +64,7 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
     };
 
     return (
-        <section className="p-4">
+        <section className="md:p-4">
             <div className="flex items-center gap-2 mt-4">
                 <button
                     onClick={handleDestinationAction}
@@ -93,10 +93,19 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
                 {/* Tabs for Places to Visit, Restaurants, and Hotels */}
                 <div className="w-full md:w-1/2">
                     <Tabs defaultValue="places" className="w-full">
-                        <TabsList className="grid grid-cols-3 w-full">
-                            <TabsTrigger value="places">🌍 Places to Visit</TabsTrigger>
-                            <TabsTrigger value="restaurants">🍽 Restaurants</TabsTrigger>
-                            <TabsTrigger value="hotels">🏨 Where to Stay</TabsTrigger>
+                        <TabsList className="grid w-full grid-cols-3">
+                            <TabsTrigger value="places">
+                                <span className="md:hidden">🌍</span>
+                                <span className="hidden md:inline">🌍 Places to Visit</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="restaurants">
+                                <span className="md:hidden">🍽</span>
+                                <span className="hidden md:inline">🍽 Restaurants</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="hotels">
+                                <span className="md:hidden">🏨</span>
+                                <span className="hidden md:inline">🏨 Where to Stay</span>
+                            </TabsTrigger>
                         </TabsList>
 
                         {/* Places to Visit */}

@@ -27,7 +27,7 @@ export default async function DestinationPage({ searchParams }: { searchParams: 
     if (!destinationData || destinationData.error) return notFound();
 
     return (
-        <div className="p-6">
+        <div className="p-4 md:p-6">
             <h1 className="text-3xl font-bold">{formattedCountry ? destinationNameWithoutCountry : destinationName}</h1>
             <DestinationDetails selectedDestination={destinationData} />
         </div>

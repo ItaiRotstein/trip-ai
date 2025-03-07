@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import SelectedPlacesDrawer from "@/components/SelectedPlacesDrawer";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
+import NavbarMobile from "./NavbarMobile";
 
 export default function Header() {
     const { isAuthenticated, logout, userName, setUserName } = useAuth();
@@ -19,9 +20,17 @@ export default function Header() {
 
     return (
         <header className="px-4 py-2 flex justify-between items-center">
-            <Link href="/">
-                <img src="/logo.svg" alt="Trip -AI" className="w-20 h-20" />
-            </Link>
+            <div className="flex items-center gap-4 md:hidden">
+                <NavbarMobile />
+                <Link href="/">
+                    <img src="/logo.svg" alt="Trip -AI" className="w-20 h-20" />
+                </Link>
+            </div>
+            <div className="hidden md:block">
+                <Link href="/">
+                    <img src="/logo.svg" alt="Trip -AI" className="w-20 h-20" />
+                </Link>
+            </div>
             <Navbar />
             <div className="flex items-center gap-4">
                 <Sheet>
@@ -30,7 +39,7 @@ export default function Header() {
                             <FaBookmark className="h-5 w-5" />
                         </Button>
                     </SheetTrigger>
-                    <SheetContent>
+                    <SheetContent className="w-[100dvw] sm:w-[100dvw] md:w-auto md:max-w-md">
                         <SheetTitle className="sr-only">Saved Places</SheetTitle>
                         <SelectedPlacesDrawer />
                     </SheetContent>

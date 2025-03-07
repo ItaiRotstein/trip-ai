@@ -17,6 +17,7 @@ interface Place {
 export default function SelectedPlacesDrawer() {
     const { isAuthenticated } = useAuth();
     const { savedPlaces, removePlace } = useSavedPlaces();
+    
     const [expandedDestinations, setExpandedDestinations] = useState<string[]>([]);
 
     const toggleDestination = (destinationName: string) => {

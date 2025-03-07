@@ -61,7 +61,7 @@ export default function DestinationSearch() {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="w-64">
-                        {attractionType ? attractionType : "Select Attraction Type"}
+                        {attractionType ? attractionType.charAt(0).toUpperCase() + attractionType.slice(1) : "Select Attraction Type"}
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">

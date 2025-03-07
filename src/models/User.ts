@@ -1,28 +1,5 @@
 import mongoose from 'mongoose';
 
-const PlaceSchema = new mongoose.Schema({
-  id: String,
-  name: String,
-  imageUrl: String,
-  mapsEmbed: String,
-  type: {
-    type: String,
-    enum: ['place', 'restaurant', 'hotel']
-  }
-});
-
-const DestinationSchema = new mongoose.Schema({
-  destination: {
-    id: String,
-    city: String,
-    country: String,
-    destinationEmbedUrl: String
-  },
-  destinationName: String,
-  destinationId: String,
-  places: [PlaceSchema]
-});
-
 const UserSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -33,7 +10,20 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
   },
-  savedPlaces: [DestinationSchema],
+  savedPlaces: [{
+    destination: {
+      type: Object,  // Or create a specific schema for destination
+      required: true
+    },
+    destinationName: {
+      type: String,
+      required: true
+    },
+    places: [{
+      type: Object,  // Or create a specific schema for places
+      default: []
+    }]
+  }],
   createdAt: {
     type: Date,
     default: Date.now,

@@ -5,7 +5,6 @@ import User from '@/models/User';
 
 async function getUserFromToken(request: Request) {
     const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-    console.log('token from saved places api', token);
     if (!token) return null;
 
     const decoded = verifyToken(token);
@@ -22,8 +21,8 @@ export async function GET(request: Request) {
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-
-        return NextResponse.json({ savedPlaces: user.savedPlaces || [] });
+        // Convert Mongoose document to plain object
+        return NextResponse.json({ savedPlaces: user.toObject().savedPlaces || [] });
     } catch (error) {
         console.error('Error fetching saved places:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

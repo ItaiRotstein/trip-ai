@@ -24,15 +24,27 @@ export async function POST(request: Request) {
 
         const { destination } = await request.json();
         const destinationName = `${destination.city}, ${destination.country}`;
-        
+
+        // Initialize savedPlaces if it doesn't exist
+        if (!user.savedPlaces) {
+            user.savedPlaces = [];
+        }
+
+        // Check if destination already exists
         if (!user.savedPlaces.some((d: any) => d.destinationName === destinationName)) {
+            // Create new savedPlace document
             user.savedPlaces.push({
                 destination,
                 destinationName,
-                destinationId: destination.id,
                 places: []
             });
+            
+            // Save the changes
             await user.save();
+            
+            // Fetch the updated user to ensure we have the latest data
+            const updatedUser = await User.findById(user._id);
+            return NextResponse.json({ savedPlaces: updatedUser?.savedPlaces });
         }
 
         return NextResponse.json({ savedPlaces: user.savedPlaces });

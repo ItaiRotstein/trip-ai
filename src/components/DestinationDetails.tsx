@@ -16,53 +16,6 @@ interface Place {
     type: 'place' | 'restaurant' | 'hotel';
 }
 
-function PlaceCards({ places, onSelect, onAction, isPlaceSaved }: {
-    places: Place[];
-    onSelect: (url: string) => void;
-    onAction: (place: Place, type: 'place' | 'restaurant' | 'hotel') => void;
-    isPlaceSaved: (id: string) => boolean;
-}) {
-    return (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-            {places.map((place: Place) => (
-                place.imageUrl &&
-                <div key={place.id} className="relative group">
-                    <Card
-                        className={`cursor-pointer hover:bg-gray-100 transition 
-                            ${isPlaceSaved(place.id) ? ' border border-green-400' : ''}`}
-                        onClick={() => onSelect(place.mapsEmbed)}
-                    >
-                        <CardHeader className="p-2">
-                            <CardTitle className="text-sm">{place.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-2">
-                            <img
-                                src={place.imageUrl}
-                                alt={place.name}
-                                className="w-full h-32 object-cover rounded-lg"
-                                referrerPolicy="no-referrer"
-                            />
-                        </CardContent>
-                    </Card>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onAction(place, 'place');
-                        }}
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                        {isPlaceSaved(place.id) ? (
-                            <FaCheck className="text-green-400" size={20} />
-                        ) : (
-                            <FaPlus className="text-white hover:text-green-400" size={20} />
-                        )}
-                    </button>
-                </div>
-            ))}
-        </div>
-    );
-}
-
 export default function DestinationDetails({ selectedDestination }: { selectedDestination: any; }) {
     const { isAuthenticated } = useAuth();
     const [selectedEmbedUrl, setSelectedEmbedUrl] = useState<string>(selectedDestination.destinationEmbedUrl);
@@ -155,7 +108,7 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
                                     ))}
                                 </div>
                             }>
-                                <PlaceCards 
+                                <PlaceCards
                                     places={selectedDestination.placesToVisit}
                                     onSelect={setSelectedEmbedUrl}
                                     onAction={(place) => handlePlaceAction(place, 'place')}
@@ -173,7 +126,7 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
                                     ))}
                                 </div>
                             }>
-                                <PlaceCards 
+                                <PlaceCards
                                     places={selectedDestination.restaurants}
                                     onSelect={setSelectedEmbedUrl}
                                     onAction={(place) => handlePlaceAction(place, 'restaurant')}
@@ -191,7 +144,7 @@ export default function DestinationDetails({ selectedDestination }: { selectedDe
                                     ))}
                                 </div>
                             }>
-                                <PlaceCards 
+                                <PlaceCards
                                     places={selectedDestination.hotels}
                                     onSelect={setSelectedEmbedUrl}
                                     onAction={(place) => handlePlaceAction(place, 'hotel')}
@@ -219,6 +172,53 @@ function PlaceCardSkeleton() {
                     <div className="w-full h-32 bg-gray-200 rounded-lg"></div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function PlaceCards({ places, onSelect, onAction, isPlaceSaved }: {
+    places: Place[];
+    onSelect: (url: string) => void;
+    onAction: (place: Place, type: 'place' | 'restaurant' | 'hotel') => void;
+    isPlaceSaved: (id: string) => boolean;
+}) {
+    return (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+            {places.map((place: Place) => (
+                place.imageUrl &&
+                <div key={place.id} className="relative group">
+                    <Card
+                        className={`cursor-pointer hover:bg-gray-100 transition 
+                            ${isPlaceSaved(place.id) ? ' border border-green-400' : ''}`}
+                        onClick={() => onSelect(place.mapsEmbed)}
+                    >
+                        <CardHeader className="p-2">
+                            <CardTitle className="text-sm">{place.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-2">
+                            <img
+                                src={place.imageUrl}
+                                alt={place.name}
+                                className="w-full h-32 object-cover rounded-lg"
+                                referrerPolicy="no-referrer"
+                            />
+                        </CardContent>
+                    </Card>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onAction(place, 'place');
+                        }}
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                        {isPlaceSaved(place.id) ? (
+                            <FaCheck className="text-green-400" size={20} />
+                        ) : (
+                            <FaPlus className="text-white hover:text-green-400" size={20} />
+                        )}
+                    </button>
+                </div>
+            ))}
         </div>
     );
 }

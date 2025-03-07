@@ -27,7 +27,7 @@ async function uploadToCloudinary(imageUrl: string) {
 }
 
 export async function GET(req: Request) {
-
+    console.log("!!!!!!!!!from google-destinations!!!!!!!!!");
     try {
         const { searchParams } = new URL(req.url);
         const city = searchParams.get("city");

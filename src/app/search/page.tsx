@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import DestinationSearch from "@/components/DestinationSearch";
+
 interface Destination {
     city: string;
     country: string;
@@ -11,6 +12,19 @@ interface Destination {
 }
 
 export default function SearchPage() {
+    return (
+        <div className="p-4">
+            <Suspense fallback={<div>Loading...</div>}>
+                <DestinationSearch />
+            </Suspense>
+            <Suspense fallback={<div>Loading results...</div>}>
+                <SearchResults />
+            </Suspense>
+        </div>
+    );
+}
+
+function SearchResults() {
     const searchParams = useSearchParams();
     const weatherType = searchParams.get("weather");
     const attractionType = searchParams.get("attraction");
@@ -57,10 +71,7 @@ export default function SearchPage() {
     }, [weatherType, attractionType, travelGroup]);
 
     return (
-        <div className="p-4">
-            <Suspense fallback={<div>Loading...</div>}> 
-                <DestinationSearch />
-            </Suspense>
+        <>
             {destinations.length > 0 && (
                 <>
                     <h3 className="text-lg font-semibold mt-6">Recommended Destinations:</h3>
@@ -86,9 +97,9 @@ export default function SearchPage() {
                     </div>
                 </>
             )}
-        </div>
+        </>
     );
-} 
+}
 
 function DestinationCards({ destinations }: { destinations: Destination[] }) {
     return (
